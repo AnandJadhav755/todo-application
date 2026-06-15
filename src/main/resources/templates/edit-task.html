@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TaskFlow · Edit Task</title>
+    <!-- Google Fonts + Font Awesome 6 for modern icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* decorative gradient blobs - same modern atmosphere as main dashboard */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -15%;
+            left: -10%;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, rgba(37,99,235,0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            right: -5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(139,92,246,0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* modern glassmorphism card */
+        .glass-card {
+            max-width: 580px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            padding: 2rem 2rem 2.2rem;
+            transition: transform 0.2s ease, box-shadow 0.2s;
+        }
+
+        /* header with back navigation */
+        .form-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .title-section h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1E2A5E, #2563eb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-section h2 i {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            color: #2563eb;
+            font-size: 1.8rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #cbd5e1;
+            border-radius: 40px;
+            padding: 0.45rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+        }
+
+        .back-btn i {
+            font-size: 0.8rem;
+        }
+
+        .back-btn:hover {
+            background: white;
+            border-color: #2563eb;
+            color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* modern form groups */
+        .form-group {
+            margin-bottom: 1.6rem;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.2px;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        label i {
+            color: #2563eb;
+            font-size: 0.9rem;
+            width: 22px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 0.95rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1.2rem;
+            background: #ffffff;
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.4, 1);
+            outline: none;
+            color: #0f172a;
+            font-weight: 500;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+            background: #ffffff;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+            border-radius: 1.2rem;
+        }
+
+        /* custom select arrow */
+        select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2347567b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* status badges preview (dynamic hint near select) */
+        .status-hint {
+            display: flex;
+            justify-content: flex-start;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 0.7rem;
+        }
+
+        .hint-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f1f5f9;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            color: #334155;
+        }
+
+        /* action buttons area */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-update {
+            background: linear-gradient(105deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.8rem;
+            font-weight: 600;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-update i {
+            font-size: 1rem;
+        }
+
+        .btn-update:hover {
+            background: linear-gradient(105deg, #1d4ed8, #1e3a8a);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #cbd5e1;
+            padding: 0.85rem 1.6rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-cancel i {
+            font-size: 0.85rem;
+        }
+
+        .btn-cancel:hover {
+            background: white;
+            border-color: #ef4444;
+            color: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* subtle helper footer */
+        .helper-note {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-top: 1.8rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-top: 1px solid rgba(203, 213, 225, 0.5);
+            padding-top: 1.2rem;
+        }
+
+        /* responsive design */
+        @media (max-width: 540px) {
+            .glass-card {
+                padding: 1.5rem;
+            }
+            .title-section h2 {
+                font-size: 1.5rem;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-update, .btn-cancel {
+                justify-content: center;
+            }
+            .form-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* micro animation for fields */
+        input:invalid, textarea:invalid {
+            border-color: #fed7d7;
+        }
+
+        /* ID field hidden but subtle indicator */
+        .hidden-id-hint {
+            font-size: 0.7rem;
+            background: #f1f4f9;
+            display: inline-block;
+            border-radius: 30px;
+            padding: 0.2rem 0.7rem;
+            margin-bottom: 1rem;
+        }
+
+        .id-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            color: #4b5563;
+            background: rgba(37,99,235,0.08);
+            width: fit-content;
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.8rem;
+        }
+
+        hr {
+            margin: 0.5rem 0 1rem;
+            border: none;
+            border-top: 1px solid rgba(203,213,225,0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card">
+    <div class="form-header">
+        <div class="title-section">
+            <h2>
+                <i class="fas fa-pen-square"></i> 
+                Update Task
+            </h2>
+        </div>
+        <a th:href="@{/}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to board
+        </a>
+    </div>
+
+    <!-- dynamic task id badge (cosmetic, shows current task id from backend) -->
+    <div class="id-badge" th:if="${task.id != null}">
+        <i class="fas fa-hashtag"></i> 
+        <span>Editing Task ID: </span>
+        <strong th:text="${task.id}"></strong>
+    </div>
+
+    <!-- main thymeleaf form: update endpoint exactly as original -->
+    <form th:action="@{/update}" th:object="${task}" method="post" id="updateTaskForm">
+        <!-- hidden id field (critical for backend binding) -->
+        <input type="hidden" th:field="*{id}">
+
+        <!-- TITLE field with modern styling -->
+        <div class="form-group">
+            <label for="editTitle">
+                <i class="fas fa-heading"></i> Title
+            </label>
+            <input type="text" 
+                   id="editTitle" 
+                   th:field="*{title}" 
+                   placeholder="e.g., Review pull requests"
+                   required 
+                   autocomplete="off">
+        </div>
+
+        <!-- DESCRIPTION field (textarea) -->
+        <div class="form-group">
+            <label for="editDescription">
+                <i class="fas fa-align-left"></i> Description
+            </label>
+            <textarea th:field="*{description}" 
+                      id="editDescription" 
+                      rows="4" 
+                      placeholder="Add detailed notes, checklist or context ..."></textarea>
+        </div>
+
+        <!-- STATUS select with full Thymeleaf binding -->
+        <div class="form-group">
+            <label for="editStatus">
+                <i class="fas fa-flag-checkered"></i> Status
+            </label>
+            <select th:field="*{status}" id="editStatus">
+                <option value="Pending">⏳ Pending — in progress / waiting</option>
+                <option value="Completed">✅ Completed — finished & delivered</option>
+            </select>
+            <!-- subtle hint badges for status meaning -->
+            <div class="status-hint">
+                <span class="hint-badge"><i class="fas fa-hourglass-half"></i> Pending: needs action</span>
+                <span class="hint-badge"><i class="fas fa-check-circle"></i> Completed: all done</span>
+            </div>
+        </div>
+
+        <!-- Form buttons group: update & cancel (same functionality as original) -->
+        <div class="action-buttons">
+            <button type="submit" class="btn-update">
+                <i class="fas fa-sync-alt"></i> Update Task
+            </button>
+            <a th:href="@{/}" class="btn-cancel">
+                <i class="fas fa-times-circle"></i> Discard
+            </a>
+        </div>
+    </form>
+
+    <div class="helper-note">
+        <i class="fas fa-info-circle"></i> 
+        Modify task details and click <strong>Update Task</strong> to save changes.
+    </div>
+</div>
+
+<!-- Micro-interactions: form validation polish & live status indicator -->
+<script>
+    (function() {
+        // reference to form elements
+        const form = document.getElementById('updateTaskForm');
+        const titleField = document.getElementById('editTitle');
+        const statusSelect = document.getElementById('editStatus');
+        
+        // Optional live status preview (just for delight)
+        if (statusSelect) {
+            const updateBadgeHint = () => {
+                // simply visual, doesn't interfere with binding
+                const selectedVal = statusSelect.value;
+                const parentGroup = statusSelect.closest('.form-group');
+                if (parentGroup) {
+                    let existingPreview = parentGroup.querySelector('.live-status-preview');
+                    if (!existingPreview) {
+                        const previewSpan = document.createElement('div');
+                        previewSpan.className = 'live-status-preview';
+                        previewSpan.style.fontSize = '0.7rem';
+                        previewSpan.style.marginTop = '0.4rem';
+                        previewSpan.style.display = 'flex';
+                        previewSpan.style.alignItems = 'center';
+                        previewSpan.style.gap = '6px';
+                        parentGroup.appendChild(previewSpan);
+                        existingPreview = previewSpan;
+                    }
+                    if (selectedVal === 'Completed') {
+                        existingPreview.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> <span style="color:#15803d;">Task marked as Completed — it will appear with green badge</span>';
+                    } else {
+                        existingPreview.innerHTML = '<i class="fas fa-clock" style="color:#f97316;"></i> <span style="color:#b45309;">Pending status — active task, shown as orange badge</span>';
+                    }
+                }
+            };
+            statusSelect.addEventListener('change', updateBadgeHint);
+            updateBadgeHint(); // initial call
+        }
+
+        // Title field validation + micro animation
+        if (titleField) {
+            titleField.addEventListener('invalid', function(e) {
+                if (this.validity.valueMissing) {
+                    this.style.borderColor = '#f97316';
+                    this.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.2)';
+                }
+                e.preventDefault(); // avoid ugly default bubble but keep required validation
+            });
+            titleField.addEventListener('input', function() {
+                this.style.borderColor = '#e2e8f0';
+                this.style.boxShadow = 'none';
+            });
+        }
+
+        // add subtle click animation on update button
+        const updateBtn = document.querySelector('.btn-update');
+        if (updateBtn) {
+            updateBtn.addEventListener('click', function(e) {
+                if (titleField && !titleField.value.trim()) {
+                    e.preventDefault();
+                    titleField.focus();
+                    titleField.style.borderColor = '#dc2626';
+                    titleField.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.15)';
+                } else {
+                    // playful feedback before submission
+                    this.style.transform = 'scale(0.97)';
+                    setTimeout(() => {
+                        if (this) this.style.transform = '';
+                    }, 130);
+                }
+            });
+        }
+
+        // tiny ripple effect on cancel (just aesthetic)
+        const cancelBtn = document.querySelector('.btn-cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.96)';
+                setTimeout(() => {
+                    if (this) this.style.transform = '';
+                }, 100);
+            });
+        }
+
+        // additional focus glow for all input fields
+        const allFields = document.querySelectorAll('input, textarea, select');
+        allFields.forEach(field => {
+            field.addEventListener('focus', () => {
+                field.style.transition = 'all 0.15s';
+            });
+        });
+        
+        // small improvement: Show id preview if hidden field exists
+        const hiddenIdInput = document.querySelector('input[name="id"]');
+        if (hiddenIdInput && hiddenIdInput.value && hiddenIdInput.value !== '') {
+            const idBadge = document.querySelector('.id-badge strong');
+            if (idBadge) {
+                // sync display with actual hidden value in case thymeleaf already sets it.
+                // no extra action needed, thymeleaf takes care
+            }
+        }
+    })();
+</script>
+
+-->
+</body>
+</html>

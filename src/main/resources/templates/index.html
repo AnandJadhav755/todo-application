@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TaskFlow • Todo App</title>
+    <!-- Google Fonts + Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #eef2ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+
+        /* modern glassmorphism effect + decorative blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, rgba(37,99,235,0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            right: -5%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(139,92,246,0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            backdrop-filter: blur(2px);
+        }
+
+        /* header card style */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1E2A5E, #2563eb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            background: none;
+            background-clip: unset;
+            -webkit-background-clip: unset;
+            color: #2563eb;
+            font-size: 2rem;
+        }
+
+        .btn-add {
+            background: linear-gradient(105deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 18px rgba(37,99,235,0.25);
+            border: none;
+            font-size: 0.95rem;
+            letter-spacing: -0.2px;
+        }
+
+        .btn-add i {
+            font-size: 1.1rem;
+        }
+
+        .btn-add:hover {
+            background: linear-gradient(105deg, #1d4ed8, #1e3a8a);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(37,99,235,0.35);
+        }
+
+        /* table modern card style */
+        .task-table-wrapper {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 1.75rem;
+            padding: 0.1rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.02);
+            border: 1px solid rgba(255,255,255,0.8);
+            overflow-x: auto;
+            transition: all 0.2s;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+            min-width: 620px;
+        }
+
+        th {
+            text-align: left;
+            padding: 1.2rem 1.2rem;
+            background: rgba(37,99,235,0.08);
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            border-bottom: 1.5px solid rgba(37,99,235,0.2);
+        }
+
+        th:first-child {
+            border-top-left-radius: 1.5rem;
+        }
+        th:last-child {
+            border-top-right-radius: 1.5rem;
+        }
+
+        td {
+            padding: 1.2rem 1.2rem;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.5);
+            color: #0f172a;
+            font-weight: 500;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(37,99,235,0.03);
+            transition: 0.15s;
+        }
+
+        /* status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            width: fit-content;
+            backdrop-filter: blur(2px);
+        }
+
+        .completed {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .pending {
+            background: #fff3e3;
+            color: #b45309;
+            border: 1px solid #ffedd5;
+        }
+
+        /* actions buttons group */
+        .actions-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: all 0.2s ease;
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        .action-btn i {
+            font-size: 0.8rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .btn-edit:hover {
+            color: #2563eb;
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .btn-complete:hover {
+            color: #10b981;
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .btn-delete:hover {
+            color: #dc2626;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        /* empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background: rgba(255,255,255,0.6);
+            border-radius: 2rem;
+            margin-top: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #475569;
+            font-weight: 500;
+        }
+
+        /* subtle footer */
+        .footer-note {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            font-weight: 400;
+        }
+
+        /* responsive */
+        @media (max-width: 680px) {
+            body {
+                padding: 1rem;
+            }
+            .header {
+                padding: 1rem 1.25rem;
+            }
+            th, td {
+                padding: 0.9rem 0.8rem;
+            }
+            .actions-group {
+                gap: 6px;
+            }
+            .action-btn {
+                padding: 0.3rem 0.7rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>
+            <i class="fas fa-check-double"></i> 
+            TaskFlow
+        </h1>
+        <a href="/add" class="btn-add">
+            <i class="fas fa-plus-circle"></i> Add Task
+        </a>
+    </div>
+
+    <div class="task-table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th># ID</th>
+                    <th><i class="fas fa-heading"></i> Title</th>
+                    <th><i class="fas fa-align-left"></i> Description</th>
+                    <th><i class="fas fa-flag-checkered"></i> Status</th>
+                    <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Thymeleaf iteration with modern UI elements -->
+                <tr th:each="task,taskStat : ${tasks}">
+                    <td th:text="${taskStat.count}" style="font-weight: 600; color:#2c3e66;"></td>
+                    <td th:text="${task.title}" style="font-weight: 600;"></td>
+                    <td th:text="${task.description}" style="color:#334155; max-width: 280px; word-break: break-word;"></td>
+                    <td>
+                        <!-- dynamic badge with icon based on status -->
+                        <span th:if="${task.status == 'Completed'}" class="badge completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span th:text="${task.status}">Completed</span>
+                        </span>
+                        <span th:if="${task.status != 'Completed'}" class="badge pending">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${task.status}">Pending</span>
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions-group">
+                            <a class="action-btn btn-edit" th:href="@{/edit/{id}(id=${task.id})}">
+                                <i class="fas fa-pen-alt"></i> Edit
+                            </a>
+                            <a class="action-btn btn-complete" th:href="@{/complete/{id}(id=${task.id})}">
+                                <i class="fas fa-check-circle"></i> Complete
+                            </a>
+                            <a class="action-btn btn-delete" th:href="@{/delete/{id}(id=${task.id})}" onclick="return confirm('Delete this task?')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Fallback: when tasks list is empty (server-side fallback with Thymeleaf) -->
+                <tr th:if="${tasks.isEmpty()}">
+                    <td colspan="5" style="text-align: center; background: transparent;">
+                        <div class="empty-state" style="background: none;">
+                            <i class="fas fa-tasks"></i>
+                            <p>No tasks yet. Create your first task! 🚀</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="footer-note">
+        <i class="fas fa-rocket"></i> Stay organized • TaskFlow modern experience
+    </div>
+</div>
+
+<!-- subtle interactive js (just for confirm delete + smooth hover vibe, no backend interference) -->
+<script>
+    // optional: Add subtle client-side confirm for delete (but already used inline confirm)
+    // Enhance all delete links to show better dialog - also improve dynamic status badge reflection 
+    // (just for UX, leaving backend intact)
+    document.addEventListener('DOMContentLoaded', function() {
+        // if any delete link doesn't have confirm (for safety), attach a confirm
+        const deleteLinks = document.querySelectorAll('.btn-delete');
+        deleteLinks.forEach(link => {
+            if (!link.hasAttribute('onclick')) {
+                link.addEventListener('click', function(e) {
+                    if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+
+        // micro animation: add a soft 'pop' effect when any action button clicked
+        const allActionButtons = document.querySelectorAll('.action-btn');
+        allActionButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // don't interfere with actual navigation, just add ripple-like class briefly
+                const originalTransition = this.style.transition;
+                this.style.transform = 'scale(0.96)';
+                setTimeout(() => {
+                    if (this) this.style.transform = '';
+                }, 120);
+            });
+        });
+    });
+</script>
+
+<!-- extra note: fully compatible with Thymeleaf, retains all original endpoints: /add, /edit/{id}, /complete/{id}, /delete/{id} -->
+</body>
+</html>
