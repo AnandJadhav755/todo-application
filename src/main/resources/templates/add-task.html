@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>TaskFlow · Create New Task</title>
     <!-- Google Fonts + Font Awesome 6 -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -33,7 +36,7 @@
             left: -10%;
             width: 320px;
             height: 320px;
-            background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, rgba(37,99,235,0) 70%);
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0) 70%);
             border-radius: 50%;
             z-index: -1;
             pointer-events: none;
@@ -46,7 +49,7 @@
             right: -5%;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(139,92,246,0) 70%);
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, rgba(139, 92, 246, 0) 70%);
             border-radius: 50%;
             z-index: -1;
             pointer-events: none;
@@ -146,7 +149,9 @@
             width: 20px;
         }
 
-        input, textarea, select {
+        input,
+        textarea,
+        select {
             width: 100%;
             padding: 0.85rem 1rem;
             font-family: 'Inter', monospace;
@@ -160,7 +165,9 @@
             font-weight: 500;
         }
 
-        input:focus, textarea:focus, select:focus {
+        input:focus,
+        textarea:focus,
+        select:focus {
             border-color: #2563eb;
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
             background: #ffffff;
@@ -268,144 +275,145 @@
             .glass-card {
                 padding: 1.5rem;
             }
+
             .form-header h2 {
                 font-size: 1.5rem;
             }
+
             .action-buttons {
                 flex-direction: column;
                 align-items: stretch;
             }
-            .btn-save, .btn-cancel {
+
+            .btn-save,
+            .btn-cancel {
                 justify-content: center;
             }
         }
 
         /* smooth field validation hint (optional subtle) */
-        input:invalid, textarea:invalid {
+        input:invalid,
+        textarea:invalid {
             border-color: #fecaca;
         }
     </style>
 </head>
+
 <body>
 
-<div class="glass-card">
-    <div class="form-header">
-        <h2>
-            <i class="fas fa-plus-circle"></i> 
-            Create task
-        </h2>
-        <a th:href="@{/}" class="back-btn">
-            <i class="fas fa-arrow-left"></i> Back to tasks
-        </a>
-    </div>
-
-    <!-- Modern Thymeleaf form binding - absolutely compatible with backend -->
-    <form th:action="@{/save}" th:object="${task}" method="post" id="taskForm">
-        <!-- Title field with icon -->
-        <div class="form-group">
-            <label for="titleInput">
-                <i class="fas fa-heading"></i> Title
-            </label>
-            <input type="text" 
-                   id="titleInput"
-                   th:field="*{title}" 
-                   placeholder="e.g., Finish project report"
-                   required 
-                   autocomplete="off">
-        </div>
-
-        <!-- Description field with textarea -->
-        <div class="form-group">
-            <label for="descTextarea">
-                <i class="fas fa-align-left"></i> Description
-            </label>
-            <textarea th:field="*{description}" 
-                      id="descTextarea" 
-                      rows="4" 
-                      placeholder="Write details, subtasks, or notes ..."></textarea>
-        </div>
-
-        <!-- Status selection with badge style preview -->
-        <div class="form-group">
-            <label for="statusSelect">
-                <i class="fas fa-flag-checkered"></i> Status
-            </label>
-            <select th:field="*{status}" id="statusSelect">
-                <option value="Pending">⏳ Pending — needs attention</option>
-                <option value="Completed">✅ Completed — all done</option>
-            </select>
-        </div>
-
-        <!-- Action Buttons group -->
-        <div class="action-buttons">
-            <button type="submit" class="btn-save">
-                <i class="fas fa-save"></i> Save Task
-            </button>
-            <a th:href="@{/}" class="btn-cancel">
-                <i class="fas fa-times-circle"></i> Cancel
+    <div class="glass-card">
+        <div class="form-header">
+            <h2>
+                <i class="fas fa-plus-circle"></i>
+                Create task
+            </h2>
+            <a th:href="@{/}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to tasks
             </a>
         </div>
-    </form>
 
-    <div class="helper-note">
-        <i class="fas fa-info-circle"></i> 
-        Fields with <span style="color:#dc2626;">*</span> are required. Stay productive with TaskFlow.
+        <!-- Modern Thymeleaf form binding - absolutely compatible with backend -->
+        <form th:action="@{/save}" th:object="${task}" method="post" id="taskForm">
+            <!-- Title field with icon -->
+            <div class="form-group">
+                <label for="titleInput">
+                    <i class="fas fa-heading"></i> Title
+                </label>
+                <input type="text" id="titleInput" th:field="*{title}" placeholder="e.g., Finish project report"
+                    required autocomplete="off">
+            </div>
+
+            <!-- Description field with textarea -->
+            <div class="form-group">
+                <label for="descTextarea">
+                    <i class="fas fa-align-left"></i> Description
+                </label>
+                <textarea th:field="*{description}" id="descTextarea" rows="4"
+                    placeholder="Write details, subtasks, or notes ..."></textarea>
+            </div>
+
+            <!-- Status selection with badge style preview -->
+            <div class="form-group">
+                <label for="statusSelect">
+                    <i class="fas fa-flag-checkered"></i> Status
+                </label>
+                <select th:field="*{status}" id="statusSelect">
+                    <option value="Pending">⏳ Pending — needs attention</option>
+                    <option value="Completed">✅ Completed — all done</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons group -->
+            <div class="action-buttons">
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Save Task
+                </button>
+                <a th:href="@{/}" class="btn-cancel">
+                    <i class="fas fa-times-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+
+        <div class="helper-note">
+            <i class="fas fa-info-circle"></i>
+            Fields with <span style="color:#dc2626;">*</span> are required. Stay productive with TaskFlow.
+        </div>
     </div>
-</div>
 
-<!-- Optional micro-interaction: subtle live feedback for title requirement -->
-<script>
-    (function() {
-        // Add tiny ui polish - ensures required field gets subtle focus glow on invalid attempt
-        const form = document.getElementById('taskForm');
-        const titleInput = document.getElementById('titleInput');
+    <!-- Optional micro-interaction: subtle live feedback for title requirement -->
+    <script>
+        (function () {
+            // Add tiny ui polish - ensures required field gets subtle focus glow on invalid attempt
+            const form = document.getElementById('taskForm');
+            const titleInput = document.getElementById('titleInput');
 
-        if (titleInput) {
-            titleInput.addEventListener('invalid', function(e) {
-                if (this.validity.valueMissing) {
-                    this.style.borderColor = '#f97316';
-                    this.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.2)';
-                }
-            });
-            titleInput.addEventListener('input', function() {
-                this.style.borderColor = '#e2e8f0';
-                this.style.boxShadow = 'none';
-            });
-        }
+            if (titleInput) {
+                titleInput.addEventListener('invalid', function (e) {
+                    if (this.validity.valueMissing) {
+                        this.style.borderColor = '#f97316';
+                        this.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.2)';
+                    }
+                });
+                titleInput.addEventListener('input', function () {
+                    this.style.borderColor = '#e2e8f0';
+                    this.style.boxShadow = 'none';
+                });
+            }
 
-        // optional smooth ripple on save button click (cosmetic)
-        const saveBtn = document.querySelector('.btn-save');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', function(e) {
-                // just a subtle micro-feedback, doesn't interrupt submission
-                if (!titleInput.value.trim()) {
-                    e.preventDefault(); // but let browser handle required validation
-                    titleInput.focus();
-                    titleInput.style.borderColor = '#dc2626';
-                    titleInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.2)';
-                } else {
-                    // playful animation
-                    this.style.transform = 'scale(0.97)';
-                    setTimeout(() => {
-                        if (this) this.style.transform = '';
-                    }, 120);
-                }
-            });
-        }
+            // optional smooth ripple on save button click (cosmetic)
+            const saveBtn = document.querySelector('.btn-save');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function (e) {
+                    // just a subtle micro-feedback, doesn't interrupt submission
+                    if (!titleInput.value.trim()) {
+                        e.preventDefault(); // but let browser handle required validation
+                        titleInput.focus();
+                        titleInput.style.borderColor = '#dc2626';
+                        titleInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.2)';
+                    } else {
+                        // playful animation
+                        this.style.transform = 'scale(0.97)';
+                        setTimeout(() => {
+                            if (this) this.style.transform = '';
+                        }, 120);
+                    }
+                });
+            }
 
-       
-        const inputs = document.querySelectorAll('input, textarea, select');
-        inputs.forEach(field => {
-            field.addEventListener('focus', () => {
-                field.parentElement.classList.add('focused');
+
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(field => {
+                field.addEventListener('focus', () => {
+                    field.parentElement.classList.add('focused');
+                });
+                field.addEventListener('blur', () => {
+                    field.parentElement.classList.remove('focused');
+                });
             });
-            field.addEventListener('blur', () => {
-                field.parentElement.classList.remove('focused');
-            });
-        });
-    })();
-</script>
+        })();
+    </script>
 
 
 </body>
+
 </html>
